@@ -9,7 +9,7 @@ int main(void) {
     robot_turn_right(&bot);
     robot_move_forward(&bot, 10);
 
-    robot_print_status(&bot);
+    roboprint_status(&bot);
 
     return 0;
 }
