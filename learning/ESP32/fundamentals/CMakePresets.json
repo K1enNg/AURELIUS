@@ -1,0 +1,28 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default (development)",
+      "description": "Development configuration",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+        "SDKCONFIG": "${sourceDir}/build/default/sdkconfig"
+      }
+    },
+    {
+      "name": "production",
+      "displayName": "Production",
+      "description": "Production configuration",
+      "binaryDir": "${sourceDir}/build/production",
+      "cacheVariables": {
+        "SDKCONFIG": "${sourceDir}/build/production/sdkconfig"
+      }
+    }
+  ]
+}
