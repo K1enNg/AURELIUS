@@ -1,0 +1,8 @@
+-specs=picolibc.specs
+-D__PICOLIBC_ERRNO_FUNCTION=__errno
+-D__STDC_WANT_LIB_EXT1__=0
+-Wno-frame-address
+-mlongcalls
+-fno-builtin-memcpy
+-fno-builtin-memset
+-fno-builtin-bzero

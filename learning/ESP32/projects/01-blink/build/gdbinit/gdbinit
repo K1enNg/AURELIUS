@@ -1,0 +1,2 @@
+source /home/kien-nguyen/Desktop/AURELIUS/learning/ESP32/projects/01-blink/build/gdbinit/symbols
+source /home/kien-nguyen/Desktop/AURELIUS/learning/ESP32/projects/01-blink/build/gdbinit/connect
