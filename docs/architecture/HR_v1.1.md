@@ -195,6 +195,45 @@ Future members should be able to learn from previous work.
 
 ---
 
+## Mechanical Engineering Team
+
+###R esponsibilities
+
+- Learn the fundamentals of robot design
+- Research different robot structures and movement systems
+- Design and improve the physical body of AURELIUS
+- Support integration of electronics, sensors, and power systems
+- Assist with prototyping and manufacturing
+
+### Beginner Tasks
+
+Learn CAD Software
+Become familiar with at least one CAD platform:
+
+- Fusion 360
+- SolidWorks
+- Onshape
+
+Suggested goal:
+
+- Create simple parts
+- Create assemblies
+- Learn basic engineering drawings
+- Research Robot Designs
+
+Study existing robots such as:
+
+- TARS (Interstellar)
+- WALL-E
+- Rover robots
+- Differential-drive robots
+
+Questions to consider:
+
+- How do they move?
+- Why was that design chosen?
+- What are the advantages and disadvantages?
+
 # Development Roadmap
 
 ## Phase 1 – Learning Foundations
