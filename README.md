@@ -285,22 +285,6 @@ Current Status
 
 * * *
 
-Roadmap
--------
-
-See [`ROADMAP.md`](https://chatgpt.com/g/g-p-6a7fb4e07874819189f459ad5592d103/c/ROADMAP.md) for the current development plan.
-
-* * *
-
-Contributing
-------------
-
-AURELIUS currently begins as a solo project, but the repository is structured with future collaboration in mind.
-
-See [`CONTRIBUTING.md`](https://chatgpt.com/g/g-p-6a7fb4e07874819189f459ad5592d103/c/CONTRIBUTING.md) for development guidelines. 
-
-* * *
-
 License
 -------
 
