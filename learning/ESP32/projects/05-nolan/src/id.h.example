@@ -1,0 +1,5 @@
+#pragma once
+
+#define WIFI_SSID "YOUR_WIFI"
+#define WIFI_PASS "YOUR_PASS"
+#define STREAM_HOST "192.168.1.50"
