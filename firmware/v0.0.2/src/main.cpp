@@ -8,9 +8,7 @@
 #include <time.h>
 #include "id.h"
 
-// ============================================================
-//  Pins
-// ============================================================
+// Pins
 // Buttons: 0 = UP, 1 = DOWN, 2 = SELECT (hold SELECT = back to menu)
 const int BTN[3] = {13, 14, 32};
 const int LED_R = 4, LED_G = 25, LED_B = 33;
@@ -19,18 +17,14 @@ const int BUZZER = 15;
 TFT_eSPI tft;
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 
-// ============================================================
 //  Screen geometry (portrait)
-// ============================================================
-constexpr int ROTATION = 0;   // 0 = portrait; use 2 if the image is upside down
-constexpr int SCREEN_W = 320;
+constexpr int ROTATION = 0;   // 0 = portrait
 constexpr int SCREEN_H = 480;
-constexpr int BAR_H    = 60;  // menu top bar
-constexpr int HINT_Y   = 440; // two-line hint area at the bottom
+constexpr int SCREEN_W = 320;
+constexpr int BAR_H    = 60;  
+constexpr int HINT_Y   = 440;
 
-// ============================================================
 //  Colors
-// ============================================================
 constexpr uint16_t rgb(uint8_t r, uint8_t g, uint8_t b) {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
@@ -38,9 +32,7 @@ const uint16_t COL_BAR  = rgb(24, 26, 34);
 const uint16_t COL_TILE = rgb(28, 30, 38);
 const uint16_t COL_EDGE = rgb(60, 64, 76);
 
-// ============================================================
 //  Screens and menu tiles (2 columns x 3 rows)
-// ============================================================
 enum Screen { SCR_MENU, SCR_CLOCK, SCR_WEATHER, SCR_LIGHTS, SCR_SOUND, SCR_NETWORK, SCR_SYSTEM };
 
 struct Tile { const char* label; uint16_t color; Screen target; };
@@ -59,10 +51,10 @@ int menuIndex = 0;
 bool redraw = true;          // true = current screen needs a full redraw
 unsigned long lastInfo = 0;  // refresh timer for the live info screens
 
-// ============================================================
 //  State
-// ============================================================
 bool muted = false;
+bool ntpSynced = false;
+unsigned long bootMillis = 0;
 
 // weather
 float curTemp = NAN;
@@ -79,9 +71,7 @@ const char* LIGHT_NAMES[LM_COUNT] = {"Auto (weather)", "Off", "Red", "Green", "B
 int lightMode = LM_AUTO;
 bool ledState[3] = {false, false, false};
 
-// ============================================================
 //  Basic helpers
-// ============================================================
 void beep(int ms = 40) {
   if (muted) return;
   digitalWrite(BUZZER, HIGH); delay(ms); digitalWrite(BUZZER, LOW);
@@ -158,9 +148,7 @@ bool fetchWeather() {
   return true;
 }
 
-// ============================================================
 //  Drawing helpers (320 x 480 portrait)
-// ============================================================
 void drawHeader(const char* title) {
   tft.fillRect(0, 0, SCREEN_W, 40, COL_BAR);
   tft.setTextColor(TFT_WHITE, COL_BAR);
@@ -191,7 +179,7 @@ void drawInfoRow(int y, const char* label, const String& value) {
   tft.drawString(value.c_str(), 16, y + 20, 4);
 }
 
-// ---------- menu dashboard ----------
+// menu dashboard 
 void drawIcon(int i, int cx, int cy, uint16_t c) {
   switch (i) {
     case 0:  // clock
@@ -304,14 +292,35 @@ void renderMenu(const tm& t, bool haveTime) {
   }
 }
 
-// ---------- clock ----------
+// clock 
 void drawClockWaiting() {
   tft.fillScreen(TFT_BLACK);
   drawHeader("CLOCK");
   drawHint("HOLD SELECT: back");
-  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+
   tft.setTextDatum(MC_DATUM);
-  tft.drawString("Syncing time...", SCREEN_W / 2, 240, 4);
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+
+  unsigned long elapsed = (millis() - bootMillis) / 1000;
+  char buf[24];
+
+  snprintf(buf, sizeof(buf), "%02lu:%02lu:%02lu",
+           (elapsed / 3600) % 100,
+           (elapsed / 60) % 60,
+           elapsed % 60);
+
+  tft.drawString(buf, SCREEN_W / 2, 150, 7);
+
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.drawString("Waiting for NTP...", SCREEN_W / 2, 220, 2);
+
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(
+      WiFi.status() == WL_CONNECTED
+          ? "WiFi connected"
+          : "WiFi disconnected",
+      SCREEN_W / 2, 260, 2
+  );
 }
 
 // Small weather summary under the clock
@@ -366,7 +375,7 @@ void drawClock(const tm& t, bool full) {
   }
 }
 
-// ---------- weather ----------
+// weather 
 void drawWeather() {
   tft.fillScreen(TFT_BLACK);
   drawHeader("WEATHER");
@@ -413,7 +422,7 @@ void drawWeather() {
   }
 }
 
-// ---------- lights ----------
+// lights 
 const int SWATCH_X = SCREEN_W / 2, SWATCH_Y = 170, SWATCH_R = 70;
 
 void drawLightsSwatch() {
@@ -433,7 +442,7 @@ void drawLights() {
   drawHint("UP/DOWN: change mode", "HOLD SELECT: back");
 }
 
-// ---------- sound ----------
+// sound 
 void drawSound() {
   tft.fillScreen(TFT_BLACK);
   drawHeader("SOUND");
@@ -447,7 +456,7 @@ void drawSound() {
   drawHint("SELECT: mute   UP/DOWN: test beep", "HOLD SELECT: back");
 }
 
-// ---------- network ----------
+// network 
 void drawNetwork(bool full) {
   if (full) {
     tft.fillScreen(TFT_BLACK);
@@ -465,7 +474,7 @@ void drawNetwork(bool full) {
   drawInfoRow(312, "Time sync",  time(nullptr) > 1600000000L ? "Synced" : "Waiting");
 }
 
-// ---------- system ----------
+// system 
 void drawSystem(bool full) {
   if (full) {
     tft.fillScreen(TFT_BLACK);
@@ -486,9 +495,7 @@ void drawSystem(bool full) {
   drawInfoRow(312, "Uptime", buf);
 }
 
-// ============================================================
 //  OLED status (unchanged)
-// ============================================================
 void updateOled(const tm& t, bool haveTime) {
   char buf[24];
   oled.clearBuffer();
@@ -507,9 +514,7 @@ void updateOled(const tm& t, bool haveTime) {
   oled.sendBuffer();
 }
 
-// ============================================================
 //  Buttons
-// ============================================================
 enum Btn { B_NONE, B_UP, B_DOWN, B_SELECT, B_BACK };
 
 // UP / DOWN fire on press. SELECT fires on release (short press) or
@@ -616,9 +621,7 @@ void handleButton(Btn b) {
   screenButton(b);
 }
 
-// ============================================================
 //  Rendering dispatcher
-// ============================================================
 void render(const tm& t, bool haveTime) {
   static bool clockNeedsFull = true;
 
@@ -660,9 +663,7 @@ void render(const tm& t, bool haveTime) {
   redraw = false;
 }
 
-// ============================================================
 //  Arduino entry points
-// ============================================================
 void setup() {
   Serial.begin(115200);
   for (int p : BTN) pinMode(p, INPUT_PULLUP);
@@ -679,9 +680,30 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED && millis() - t0 < 15000) delay(200);
   Serial.printf("WiFi: %s\n", WiFi.status() == WL_CONNECTED ? "connected" : "FAILED");
 
-  configTzTime(TZ_INFO, "pool.ntp.org", "time.nist.gov");
-  if (WiFi.status() == WL_CONNECTED && fetchWeather()) lastWeather = millis();
+  bootMillis = millis();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    configTzTime(TZ_INFO, "pool.ntp.org", "time.nist.gov");
+    Serial.println("NTP synchronization started");
+  } else {
+    Serial.println("NTP unavailable: WiFi disconnected");
+  }
+
+  if (WiFi.status() == WL_CONNECTED && fetchWeather()) {
+    lastWeather = millis();
+  }
+
   applyLightMode();
+
+  // RGB LED startup self-test
+  setLed(true, false, false);
+  delay(250);
+  setLed(false, true, false);
+  delay(250);
+  setLed(false, false, true);
+  delay(250);
+  setLed(false, false, false);
+
   beep(80);
 }
 
@@ -715,7 +737,33 @@ void loop() {
   tm t = {};
   bool haveTime = getLocalTime(&t, 10);
 
-  render(t, haveTime);
+  bool syncedNow = time(nullptr) > 1700000000L;
 
-  if (millis() - lastOled > 1000) { lastOled = millis(); updateOled(t, haveTime); }
+  if (syncedNow && !ntpSynced) {
+    ntpSynced = true;
+    Serial.println("NTP synchronized successfully");
+    redraw = true;
+  }
+
+  if (!syncedNow && ntpSynced) {
+    ntpSynced = false;
+    redraw = true;
+  }
+
+  if (screen == SCR_CLOCK && !haveTime) {
+    static unsigned long lastFallbackDraw = 0;
+
+    if (redraw || millis() - lastFallbackDraw >= 1000) {
+      drawClockWaiting();
+      lastFallbackDraw = millis();
+      redraw = false;
+    }
+  } else {
+    render(t, haveTime);
+  }
+
+  if (millis() - lastOled > 1000) {
+    lastOled = millis();
+    updateOled(t, haveTime);
+  }
 }
