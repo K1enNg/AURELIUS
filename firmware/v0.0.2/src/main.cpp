@@ -9,12 +9,19 @@
 #include "services/lights.h"
 #include "ui/ui.h"
 #include "ui/oled_status.h"
+#include "services/sensors.h"
+#include "services/pet.h"
+
+static Sensors sensors(SENSOR_TRIG, SENSOR_ECHO, SENSOR_PIR);
+static Pet pet;
 
 void setup() {
   Serial.begin(115200);
   buttons::begin();
   lights::begin();
   sound::begin();
+  sensors.begin();
+  pet.begin();
 
   displayBegin();
   oledstatus::begin();
@@ -35,6 +42,10 @@ void loop() {
   if (b != B_NONE) ui::handleButton(b);
 
   // background services
+  sensors.update();
+  const SensorState& sensorState = sensors.state();
+  pet.update(sensorState, millis());
+
   if (weather::poll()) {
     lights::onWeatherChanged();
     if (ui::current() == ui::SCR_WEATHER) ui::requestRedraw();
@@ -48,5 +59,5 @@ void loop() {
 
   // output
   ui::render(t, haveTime);
-  oledstatus::update(t, haveTime);
+  oledstatus::update(t, haveTime, pet, sensorState);
 }

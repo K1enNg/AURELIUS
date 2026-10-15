@@ -42,4 +42,4 @@ static void onButton(Btn b) {
 
 const Def networkScreen = {render, onButton};
 
-}  // namespace screens
+}
