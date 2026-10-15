@@ -16,7 +16,7 @@ const Data& data();
 const char* codeToText(int code);
 
 void begin();          // first fetch (if WiFi is up)
-bool poll();           // call from loop(); true when new data arrived
-bool refreshNow();     // manual refresh; true on success
+bool poll();           // call from loop(), true when new data arrived
+bool refreshNow();     // manual refresh, true on success
 
-}  // namespace weather
+} 

@@ -76,4 +76,4 @@ Mode mode()              { return s_mode; }
 const char* modeName()   { return NAMES[s_mode]; }
 bool channelOn(int ch)   { return s_state[ch]; }
 
-}  // namespace lights
+}

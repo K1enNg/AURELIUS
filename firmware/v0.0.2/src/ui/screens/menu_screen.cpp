@@ -68,7 +68,6 @@ static void drawIcon(int i, int cx, int cy, uint16_t c) {
   }
 }
 
-// Tiles are 142 x 112, two per row; rows start at y = 68, 192, 316
 static void drawTile(int i, bool sel) {
   int x = 12 + (i % 2) * 154;
   int y = 68 + (i / 2) * 124;
@@ -151,4 +150,4 @@ static void onButton(Btn b) {
 
 const Def menuScreen = {render, onButton};
 
-}  // namespace screens
+}

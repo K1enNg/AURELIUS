@@ -36,4 +36,4 @@ bool poll(tm& t, bool& haveTime) {
 
 unsigned long uptimeSec() { return (millis() - s_bootMillis) / 1000; }
 
-}  // namespace timesvc
+}

@@ -6,6 +6,9 @@
 constexpr int BTN[3] = {13, 14, 32};
 constexpr int LED_R = 4, LED_G = 25, LED_B = 33;
 constexpr int BUZZER = 15;
+constexpr int SENSOR_TRIG = 16;
+constexpr int SENSOR_ECHO = 17;  // Level-shift the HC-SR04 echo to 3.3 V.
+constexpr int SENSOR_PIR = 34;   // Input-only GPIO.
 
 // screen geometry (portrait) 
 constexpr int ROTATION = 0;   // 0 = portrait

@@ -22,4 +22,4 @@ String ssid()    { return WiFi.SSID(); }
 String ip()      { return WiFi.localIP().toString(); }
 int rssi()       { return WiFi.RSSI(); }
 
-}  // namespace net
+}

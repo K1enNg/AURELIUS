@@ -15,4 +15,4 @@ Mode mode();
 const char* modeName();
 bool channelOn(int ch);       // 0 = R, 1 = G, 2 = B
 
-}  // namespace lights
+}

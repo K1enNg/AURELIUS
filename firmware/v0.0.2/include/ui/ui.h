@@ -13,4 +13,4 @@ void requestRedraw();                 // current screen does a full redraw next 
 void handleButton(Btn b);
 void render(const tm& t, bool haveTime);
 
-}  // namespace ui
+}

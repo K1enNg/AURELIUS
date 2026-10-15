@@ -54,4 +54,4 @@ static void onButton(Btn b) {
 
 const Def lightsScreen = {render, onButton};
 
-}  // namespace screens
+}
