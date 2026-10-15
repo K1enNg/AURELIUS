@@ -70,4 +70,4 @@ bool refreshNow() {
   return true;
 }
 
-}  // namespace weather
+}

@@ -1,20 +1,18 @@
 #include "services/pet.h"
 
 namespace {
-// ---- behaviour tuning ----
-constexpr int      CLOSE_CM       = 15;     // hand this close = surprised, then love
-constexpr int      CURIOUS_CM     = 60;     // something within this range = curious
-constexpr uint32_t LOVE_AFTER_MS  = 1500;   // stay close this long -> love
-constexpr uint32_t HAPPY_HOLD_MS  = 4000;   // stay happy this long after motion
-constexpr uint32_t SLEEP_AFTER_MS = 60000;  // nobody around this long -> sleep
-constexpr uint32_t MIN_HOLD_MS    = 700;    // minimum time before changing mood
+// ehaviour tuning
+constexpr int      CLOSE_CM       = 15;     
+constexpr int      CURIOUS_CM     = 60;    
+constexpr uint32_t LOVE_AFTER_MS  = 1500;   
+constexpr uint32_t HAPPY_HOLD_MS  = 4000;   
+constexpr uint32_t SLEEP_AFTER_MS = 60000; 
+constexpr uint32_t MIN_HOLD_MS    = 700;    
 
-// ---- face geometry (128 x 64 OLED, footer uses the bottom rows) ----
 constexpr int EX1 = 38, EX2 = 90, EY = 22;
 
 const char* const MOOD_NAMES[] = {"Sleeping", "Idle", "Happy", "Curious", "Surprised", "In love"};
 
-// ----- drawing helpers -----
 void normalEye(U8G2& o, int cx, int cy, bool blink, int gx, int gy) {
   o.setDrawColor(1);
   if (blink) { o.drawRBox(cx - 11, cy - 1, 22, 4, 2); return; }
@@ -22,16 +20,16 @@ void normalEye(U8G2& o, int cx, int cy, bool blink, int gx, int gy) {
   o.setDrawColor(0);
   o.drawDisc(cx + gx, cy + gy, 6);
   o.setDrawColor(1);
-  o.drawDisc(cx + gx - 2, cy + gy - 3, 2);  // highlight
+  o.drawDisc(cx + gx - 2, cy + gy - 3, 2);  
 }
 
-void happyEye(U8G2& o, int cx, int cy) {  // ^ shape
+void happyEye(U8G2& o, int cx, int cy) {
   o.setDrawColor(1);
   for (int r = 9; r <= 11; r++)
     o.drawCircle(cx, cy + 4, r, U8G2_DRAW_UPPER_LEFT | U8G2_DRAW_UPPER_RIGHT);
 }
 
-void sleepEye(U8G2& o, int cx, int cy) {  // closed, peaceful curve
+void sleepEye(U8G2& o, int cx, int cy) { 
   o.setDrawColor(1);
   for (int r = 8; r <= 9; r++)
     o.drawCircle(cx, cy - 3, r, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
@@ -59,7 +57,7 @@ void smile(U8G2& o, int cx, int cy, int r) {
   o.drawCircle(cx, cy, r + 1, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
 }
 
-void openSmile(U8G2& o, int cx, int cy, int r) {  // filled "D" mouth
+void openSmile(U8G2& o, int cx, int cy, int r) {
   o.setDrawColor(1);
   o.drawDisc(cx, cy, r, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
 }
@@ -69,7 +67,7 @@ void cheeks(U8G2& o, int yo) {
   o.drawDisc(14, 40 + yo, 2);
   o.drawDisc(114, 40 + yo, 2);
 }
-}  // namespace
+}
 
 void Pet::begin() {
   uint32_t now = millis();
@@ -126,7 +124,7 @@ void Pet::update(const SensorState& s, uint32_t now) {
 }
 
 void Pet::render(U8G2& o, uint32_t now) {
-  // ---- animation: random glances and blinks ----
+  // animation: random glances and blinks
   if (now >= _nextGlance) {
     _tgx = random(-4, 5);
     _tgy = random(-3, 4);

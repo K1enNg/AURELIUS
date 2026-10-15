@@ -11,9 +11,13 @@
 #include "ui/oled_status.h"
 #include "services/sensors.h"
 #include "services/pet.h"
+#include "services/alarm_clock.h"
+#include "ui/screens/alarm_ring.h"
 
 static Sensors sensors(SENSOR_TRIG, SENSOR_ECHO, SENSOR_PIR);
 static Pet pet;
+static bool alarmWasRinging = false;
+static bool alarmRingNeedsFullDraw = true;
 
 void setup() {
   Serial.begin(115200);
@@ -25,6 +29,7 @@ void setup() {
 
   displayBegin();
   oledstatus::begin();
+  alarmclock::begin();
 
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString("Connecting WiFi...", 20, 20, 4);
@@ -39,7 +44,14 @@ void setup() {
 void loop() {
   // input
   Btn b = buttons::read();
-  if (b != B_NONE) ui::handleButton(b);
+  if (b != B_NONE) {
+    if (alarmclock::ringing()) {
+      if (b == B_BACK) alarmclock::dismiss();
+      else             alarmclock::snooze();
+    } else {
+      ui::handleButton(b);
+    }
+  }
 
   // background services
   sensors.update();
@@ -56,8 +68,21 @@ void loop() {
   tm t = {};
   bool haveTime = false;
   if (timesvc::poll(t, haveTime)) ui::requestRedraw();
+  alarmclock::update(t, haveTime);
+
+  bool ringing = alarmclock::ringing();
+  if (ringing != alarmWasRinging) {
+    ui::requestRedraw();
+    alarmRingNeedsFullDraw = true;
+    alarmWasRinging = ringing;
+  }
 
   // output
-  ui::render(t, haveTime);
+  if (ringing) {
+    screens::alarmRingDraw(t, haveTime, alarmRingNeedsFullDraw);
+    alarmRingNeedsFullDraw = false;
+  } else {
+    ui::render(t, haveTime);
+  }
   oledstatus::update(t, haveTime, pet, sensorState);
 }

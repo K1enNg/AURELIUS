@@ -3,10 +3,10 @@
 namespace {
 constexpr uint32_t PIR_WARMUP_MS    = 30000;
 constexpr uint32_t PING_INTERVAL_MS = 100;
-constexpr uint32_t ECHO_TIMEOUT_US  = 8000;  // ~1.3 m one way
+constexpr uint32_t ECHO_TIMEOUT_US  = 8000;  
 constexpr int      MIN_CM           = 2;
 constexpr int      MAX_CM           = 120;
-}  // namespace
+}
 
 void Sensors::begin() {
   pinMode(_trig, OUTPUT);
@@ -38,16 +38,16 @@ void Sensors::update() {
   _s.warmingUp = up < PIR_WARMUP_MS;
   _s.warmupLeftS = _s.warmingUp ? (PIR_WARMUP_MS - up + 999) / 1000 : 0;
 
-  // Ultrasonic: ping on a timer, smooth the result
+  // ultrasonic: ping on a timer, smooth the result
   if (now - _lastPing >= PING_INTERVAL_MS) {
     _lastPing = now;
     int cm = readDistanceCm();
     if (cm >= 0) {
       _miss = 0;
       if (_s.distCm < 0 || abs(cm - _s.distCm) > 15) _s.distCm = cm;       // first reading or big jump
-      else _s.distCm = (_s.distCm * 6 + cm * 4) / 10;                      // smooth small changes
+      else _s.distCm = (_s.distCm * 6 + cm * 4) / 10;      // smooth small changes
     } else if (++_miss >= 3) {
-      _s.distCm = -1;                                                      // lost the object
+      _s.distCm = -1;  // lost the object
     }
   }
 
